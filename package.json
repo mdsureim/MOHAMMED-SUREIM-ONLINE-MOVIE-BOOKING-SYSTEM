@@ -1,0 +1,23 @@
+{
+  "name": "online-movie-ticket-booking-system",
+  "version": "1.0.0",
+  "description": "Online Movie Ticket Booking System built with HTML, CSS, JavaScript, Express.js, and MySQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "movie-booking",
+    "express",
+    "mysql",
+    "cinema",
+    "ticket-booking"
+  ],
+  "author": "Antigravity",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.9.8"
+  }
+}

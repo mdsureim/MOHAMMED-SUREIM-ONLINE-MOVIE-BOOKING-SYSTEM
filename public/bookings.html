@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - Online Movie Ticket Booking System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <a href="index.html" class="nav-brand">
+      <span class="brand-icon">🎬</span>
+      <span class="brand-title">Cine<span>Pass</span></span>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="index.html" class="nav-link">🎥 Movies</a></li>
+      <li><a href="bookings.html" class="nav-link active">🎟️ My Bookings</a></li>
+      <li><a href="admin.html" class="nav-link">⚙️ Admin Portal</a></li>
+      <li><span id="db-status-pill" class="db-pill"><span class="db-dot"></span> Checking DB...</span></li>
+    </ul>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.8rem; font-weight: 800; color: #fff;">🎟️ Customer Bookings Record</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">View, search, print tickets, or cancel ticket reservations</p>
+      </div>
+      <span id="bookings-count-badge" class="db-pill" style="font-size: 0.85rem; padding: 0.4rem 0.9rem;">0 Records</span>
+    </div>
+
+    <!-- FILTER & SEARCH BAR -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-bookings" class="search-input" placeholder="Search by Booking ID, Movie, Customer Name, or Email...">
+      </div>
+      
+      <div class="filter-pills">
+        <button class="pill-btn active" data-status="All">All Statuses</button>
+        <button class="pill-btn" data-status="Confirmed">Confirmed</button>
+        <button class="pill-btn" data-status="Cancelled">Cancelled</button>
+      </div>
+    </div>
+
+    <!-- BOOKINGS DATA TABLE -->
+    <div class="table-wrapper">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Movie</th>
+            <th>Theater</th>
+            <th>Date & Time</th>
+            <th>Seats</th>
+            <th>Customer</th>
+            <th>Amount & Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-table-body">
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+              Loading bookings record...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- MODAL: DIGITAL E-TICKET RECEIPT -->
+  <div id="ticket-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 550px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🎟️</span>
+          <span>Digital E-Ticket Receipt</span>
+        </div>
+        <button class="close-btn" onclick="closeTicketModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="ticket-card">
+          <div class="ticket-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="badge-lang">CinePass Official Ticket</span>
+              <span id="ticket-status-badge" class="status-badge confirmed">Confirmed</span>
+            </div>
+            <div id="ticket-movie" class="ticket-movie-title">Movie Title</div>
+            <div id="ticket-theatre" style="color: var(--accent-gold); font-weight: 600;">PVR Cinemas - Screen 1</div>
+          </div>
+
+          <div class="ticket-grid">
+            <div>
+              <div class="ticket-field-label">Booking ID</div>
+              <div id="ticket-id" class="ticket-field-val">#BK-101</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Screen</div>
+              <div id="ticket-screen" class="ticket-field-val">Audi 1</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Date</div>
+              <div id="ticket-date" class="ticket-field-val">2026-11-10</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Showtime</div>
+              <div id="ticket-time" class="ticket-field-val">10:30 AM</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Seat Numbers</div>
+              <div id="ticket-seats" class="ticket-field-val" style="color: var(--accent-cyan);">C4, C5</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Total Amount Paid</div>
+              <div id="ticket-amount" class="ticket-field-val" style="color: var(--accent-green);">₹530.00</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="ticket-field-label">Customer</div>
+            <div id="ticket-customer" class="ticket-field-val">John Doe (john@example.com)</div>
+          </div>
+
+          <div class="ticket-barcode"></div>
+          <p style="text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Valid on show date & time only. No outside food permitted.</p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button class="btn-book" onclick="printTicket()" style="background: var(--bg-card); border: 1px solid var(--border-color); flex: 1;">
+            🖨️ Print Ticket
+          </button>
+          <button class="btn-book" onclick="closeTicketModal()" style="flex: 1;">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>🎬 <strong>Online Movie Ticket Booking System</strong> — Built with HTML, CSS, JavaScript, Express.js & MySQL</p>
+  </footer>
+
+  <script src="js/bookings.js"></script>
+</body>
+</html>

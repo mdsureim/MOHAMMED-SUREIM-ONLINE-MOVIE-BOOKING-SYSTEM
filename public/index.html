@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Movie Ticket Booking System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <a href="index.html" class="nav-brand">
+      <span class="brand-icon">🎬</span>
+      <span class="brand-title">Cine<span>Pass</span></span>
+    </a>
+
+    <ul class="nav-menu">
+      <li><a href="index.html" class="nav-link active">🎥 Movies</a></li>
+      <li><a href="bookings.html" class="nav-link">🎟️ My Bookings</a></li>
+      <li><a href="admin.html" class="nav-link">⚙️ Admin Portal</a></li>
+      <li><span id="db-status-pill" class="db-pill"><span class="db-dot"></span> Checking DB...</span></li>
+    </ul>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <h1 class="hero-title">Experience Cinema at Its Best</h1>
+    <p class="hero-subtitle">Browse trending movies, compare theater timings, pick your preferred seats, and get your digital tickets in seconds.</p>
+    
+    <div class="hero-stats">
+      <div class="hero-stat-item">
+        <div id="stat-movies" class="stat-value">6</div>
+        <div class="stat-label">Now Showing</div>
+      </div>
+      <div class="hero-stat-item">
+        <div id="stat-shows" class="stat-value">10</div>
+        <div class="stat-label">Daily Shows</div>
+      </div>
+      <div class="hero-stat-item">
+        <div id="stat-bookings" class="stat-value">0</div>
+        <div class="stat-label">Tickets Booked</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+    
+    <!-- SEARCH & FILTER BAR -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-movie" class="search-input" placeholder="Search by movie title...">
+      </div>
+      
+      <div class="filter-pills">
+        <button class="pill-btn active" data-lang="All">All Languages</button>
+        <button class="pill-btn" data-lang="English">English</button>
+        <button class="pill-btn" data-lang="Hindi">Hindi</button>
+        <button class="pill-btn" data-lang="Telugu">Telugu</button>
+        <button class="pill-btn" data-lang="Tamil">Tamil</button>
+      </div>
+    </div>
+
+    <!-- MOVIES SECTION -->
+    <div class="section-heading">
+      <span>🍿</span> Now Showing in Theaters
+    </div>
+
+    <div id="movies-grid" class="movie-grid">
+      <!-- Dynamically populated via JS -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+        Loading available movies...
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: INTERACTIVE BOOKING & SEAT SELECTION -->
+  <div id="booking-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🎬</span>
+          <div>
+            <div id="booking-movie-title">Movie Title</div>
+            <div id="booking-movie-info" style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">English • 148 mins</div>
+          </div>
+        </div>
+        <button class="close-btn" onclick="closeBookingModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- STEP 1: SELECT THEATER & SHOW TIMING -->
+        <h4 style="margin-bottom: 0.75rem; color: #fff;">1. Select Theater & Showtime</h4>
+        <div id="shows-container">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- STEP 2: INTERACTIVE SEAT SELECTION -->
+        <div id="seat-selection-container" style="display: none; margin-top: 1.5rem;">
+          <h4 style="margin-bottom: 0.5rem; color: #fff;">2. Select Your Seats</h4>
+          
+          <div class="screen-visualizer">
+            <div class="curved-screen"></div>
+            <div class="screen-label">CINEMA SCREEN THIS WAY</div>
+          </div>
+
+          <div class="seat-map-wrapper">
+            <div id="seat-grid" class="seat-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="seat-legend">
+            <div class="legend-item">
+              <div class="legend-sample legend-available"></div>
+              <span>Available</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-sample legend-selected"></div>
+              <span>Selected</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-sample legend-booked"></div>
+              <span>Sold / Reserved</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: CUSTOMER DETAILS & CHECKOUT FORM -->
+        <div id="checkout-container" style="display: none;">
+          <form id="booking-form" class="checkout-panel">
+            <h4 style="margin-bottom: 1rem; color: #fff;">3. Customer Details & Confirmation</h4>
+            
+            <div class="checkout-grid">
+              <div>
+                <div class="form-group">
+                  <label class="form-label" for="customer-name">Full Name *</label>
+                  <input type="text" id="customer-name" class="form-control" placeholder="e.g. John Doe" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="customer-email">Email Address *</label>
+                  <input type="email" id="customer-email" class="form-control" placeholder="john@example.com" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="customer-phone">Phone Number</label>
+                  <input type="tel" id="customer-phone" class="form-control" placeholder="9876543210">
+                </div>
+              </div>
+
+              <!-- ORDER SUMMARY -->
+              <div class="summary-card">
+                <div>
+                  <h5 style="color: #fff; margin-bottom: 0.75rem; font-size: 1rem;">Booking Summary</h5>
+                  <div class="summary-row">
+                    <span>Seats Selected:</span>
+                    <span id="summary-seats-list" style="font-weight: 600; color: #fff;">None</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Number of Tickets:</span>
+                    <span id="summary-seat-count" style="font-weight: 600; color: #fff;">0</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Ticket Price:</span>
+                    <span id="summary-price-per-seat">₹0.00</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="summary-subtotal">₹0.00</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Convenience Fee:</span>
+                    <span id="summary-fee">₹0.00</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="summary-row highlight">
+                    <span>Total Amount:</span>
+                    <span id="summary-total" class="total-val">₹0.00</span>
+                  </div>
+                  <button type="submit" id="btn-confirm-booking" class="btn-book" style="margin-top: 1rem;" disabled>
+                    Select Seats to Book
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DIGITAL E-TICKET CONFIRMATION -->
+  <div id="ticket-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 550px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🎟️</span>
+          <span>Booking Confirmed!</span>
+        </div>
+        <button class="close-btn" onclick="closeTicketModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="ticket-card">
+          <div class="ticket-header">
+            <span class="badge-lang" style="display: inline-block; margin-bottom: 0.5rem;">CinePass Digital E-Ticket</span>
+            <div id="ticket-movie" class="ticket-movie-title">Movie Title</div>
+            <div id="ticket-theatre" style="color: var(--accent-gold); font-weight: 600;">PVR Cinemas - Screen 1</div>
+          </div>
+
+          <div class="ticket-grid">
+            <div>
+              <div class="ticket-field-label">Booking ID</div>
+              <div id="ticket-id" class="ticket-field-val">#BK-101</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Screen</div>
+              <div id="ticket-screen" class="ticket-field-val">Audi 1</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Date</div>
+              <div id="ticket-date" class="ticket-field-val">2026-11-10</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Showtime</div>
+              <div id="ticket-time" class="ticket-field-val">10:30 AM</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Seat Numbers</div>
+              <div id="ticket-seats" class="ticket-field-val" style="color: var(--accent-cyan);">C4, C5</div>
+            </div>
+            <div>
+              <div class="ticket-field-label">Total Amount Paid</div>
+              <div id="ticket-amount" class="ticket-field-val" style="color: var(--accent-green);">₹530.00</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="ticket-field-label">Customer</div>
+            <div id="ticket-customer" class="ticket-field-val">John Doe (john@example.com)</div>
+          </div>
+
+          <div class="ticket-barcode"></div>
+          <p style="text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;">Scan this digital code at theater gate for fast-track entry</p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button class="btn-book" onclick="printTicket()" style="background: var(--bg-card); border: 1px solid var(--border-color); flex: 1;">
+            🖨️ Print Ticket
+          </button>
+          <button class="btn-book" onclick="closeTicketModal()" style="flex: 1;">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>🎬 <strong>Online Movie Ticket Booking System</strong> — Built with HTML, CSS, JavaScript, Express.js & MySQL</p>
+    <p style="margin-top: 0.35rem; font-size: 0.8rem; color: var(--text-muted);">Tables: movies (movie_id, title, language, duration, release_data) • shows (show_id, movie_id, theatre_name, show_date, show_time, ticket_price) • bookings (bookings_id, user_id, seats, total_amount, booking_status)</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
